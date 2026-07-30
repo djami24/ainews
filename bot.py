@@ -44,7 +44,7 @@ KEYWORDS = [
 NEWS_PER_DIGEST = 4
 
 # Digest postining tepasidagi sarlavha va kirish qatori
-DIGEST_TITLE = "🤖 AI dunyosida nima gap?"
+DIGEST_TITLE = "AI dunyosida nima gap?"
 DIGEST_SUBTITLE = "Hozirgi soatgacha bo'lgan yangiliklar:"
 
 # Har bir postning eng pastida ko'rinadigan kanal linki
@@ -120,7 +120,7 @@ def send_digest_to_telegram(items: list[dict]) -> bool:
             "chat_id": CHAT_ID,
             "text": text,
             "parse_mode": "HTML",
-            "disable_web_page_preview": True,
+            "disable_web_page_preview": False,
         },
         timeout=30,
     )
