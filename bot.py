@@ -2,18 +2,26 @@
 AI yangiliklarini avtomatik joylovchi Telegram bot.
 
 Ishlash mantig'i:
-1. RSS manbalaridan so'nggi maqolalarni o'qiydi
-2. Kalit so'zlar bo'yicha AI-mavzudagi maqolalarni ajratadi
-3. Avval joylanmagan (seen.json'da yo'q) maqolalarni tanlaydi
-4. Sarlavhalarni o'zbek tiliga tarjima qiladi
-5. Bir nechta yangilikni BITTA digest postga yig'adi:
+1. HackerNews'dan (Algolia API orqali) so'nggi soatlar ichidagi
+   AI-mavzudagi eng ko'p ball (popularity) to'plagan postlarni oladi
+   — bu "eng ko'p odamlar ko'rgan/muhokama qilgan" degan ma'noni beradi
+2. Agar yetarlicha topilmasa, oddiy RSS manbalaridan to'ldiradi
+3. Barchasini ball (popularity) bo'yicha saralaydi
+4. Avval joylanmagan (seen.json'da yo'q) eng yuqoridagilarni tanlaydi
+5. Sarlavhalarni o'zbek tiliga tarjima qiladi
+6. Bir nechta yangilikni BITTA digest postga yig'adi:
    "AI dunyosida nima gap?" sarlavhasi + har biri o'z havolasiga
    bog'langan sarlavhalar ro'yxati + eng pastda kanal linki
-6. Telegram kanaliga joylaydi va linklarni seen.json'ga yozadi
+7. Telegram kanaliga joylaydi va linklarni seen.json'ga yozadi
+
+Bu skript har 30 daqiqada GitHub Actions orqali avtomatik ishga tushadi
+(.github/workflows/post.yml faylida sozlangan).
 """
 
 import json
 import os
+import re
+import time
 from pathlib import Path
 
 import feedparser
@@ -22,7 +30,15 @@ from deep_translator import GoogleTranslator
 
 # ---------- SOZLAMALAR ----------
 
-# Kuzatiladigan RSS manbalari. Xohlagancha qo'shishingiz/o'chirishingiz mumkin.
+# --- HackerNews orqali popularity bo'yicha qidiruv ---
+# HN'da AI-mavzuda qidiriladigan kalit so'zlar
+HN_KEYWORDS = ["AI", "LLM", "GPT", "Claude", "OpenAI", "Anthropic", "machine learning"]
+# Necha soat oldingi postlargacha qaraladi
+HN_LOOKBACK_HOURS = 24
+# Kamida shuncha ball (points) to'plagan postlar "mashhur" hisoblanadi
+HN_MIN_POINTS = 15
+
+# --- RSS manbalari (HN'dan yetarli topilmasa, shulardan to'ldiriladi) ---
 RSS_FEEDS = [
     "https://techcrunch.com/category/artificial-intelligence/feed/",
     "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
@@ -32,8 +48,7 @@ RSS_FEEDS = [
 ]
 
 # Maqola AI-mavzuda deb hisoblanishi uchun sarlavha/xulosada shu so'zlardan
-# kamida bittasi bo'lishi kerak (agar barcha feedlar allaqachon AI-mavzuda
-# bo'lsa, bu ro'yxatni bo'sh qoldirsangiz ham bo'ladi).
+# kamida bittasi bo'lishi kerak
 KEYWORDS = [
     "ai", "artificial intelligence", "llm", "gpt", "claude", "gemini",
     "chatbot", "machine learning", "openai", "anthropic", "deepmind",
@@ -45,7 +60,7 @@ NEWS_PER_DIGEST = 4
 
 # Digest postining tepasidagi sarlavha va kirish qatori
 DIGEST_TITLE = "AI dunyosida nima gap?"
-DIGEST_SUBTITLE = "Hozirgi soatgacha bo'lgan yangiliklar:"
+DIGEST_SUBTITLE = "Hozirgi soatgacha bo'lgan eng mashhur yangiliklar:"
 
 # Har bir postning eng pastida ko'rinadigan kanal linki
 CHANNEL_LINK = "https://t.me/aiyangiliklaruz"
@@ -53,7 +68,7 @@ CHANNEL_LINK = "https://t.me/aiyangiliklaruz"
 # Ko'rilgan linklar saqlanadigan fayl
 SEEN_FILE = Path(__file__).parent / "seen.json"
 
-# Telegram sozlamalari — GitHub Secrets orqali beriladi (pastga qarang)
+# Telegram sozlamalari — GitHub Secrets orqali beriladi
 BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
 CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
 
@@ -67,12 +82,11 @@ def load_seen() -> set[str]:
 
 
 def save_seen(seen: set[str]) -> None:
-    # Fayl cheksiz o'smasligi uchun oxirgi 500 tasini saqlaymiz
     trimmed = list(seen)[-500:]
     SEEN_FILE.write_text(json.dumps(trimmed, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
-def is_relevant(title: str, summary: str) -> bool:
+def is_relevant(title: str, summary: str = "") -> bool:
     if not KEYWORDS:
         return True
     text = f"{title} {summary}".lower()
@@ -90,9 +104,6 @@ def translate_to_uz(text: str) -> str:
 
 
 def clean_summary(raw_summary: str, max_len: int = 220) -> str:
-    # RSS summary'lardagi HTML teglarni olib tashlaymiz (oddiy usul)
-    import re
-
     text = re.sub(r"<[^>]+>", "", raw_summary or "")
     text = " ".join(text.split())
     if len(text) > max_len:
@@ -100,9 +111,74 @@ def clean_summary(raw_summary: str, max_len: int = 220) -> str:
     return text
 
 
+def fetch_hn_stories() -> list[dict]:
+    """HackerNews'dan (Algolia Search API) so'nggi HN_LOOKBACK_HOURS soat
+    ichidagi, ballari HN_MIN_POINTS'dan yuqori bo'lgan AI-mavzudagi
+    postlarni oladi. Natija: [{"title", "link", "points"}, ...]"""
+    since = int(time.time()) - HN_LOOKBACK_HOURS * 3600
+    found: dict[str, dict] = {}
+
+    for kw in HN_KEYWORDS:
+        url = (
+            "https://hn.algolia.com/api/v1/search"
+            f"?query={requests.utils.quote(kw)}"
+            "&tags=story"
+            f"&numericFilters=created_at_i>{since},points>{HN_MIN_POINTS}"
+        )
+        try:
+            resp = requests.get(url, timeout=20)
+            resp.raise_for_status()
+            hits = resp.json().get("hits", [])
+        except Exception as e:
+            print(f"HackerNews so'rovida xato ({kw}): {e}")
+            continue
+
+        for hit in hits:
+            title = hit.get("title") or hit.get("story_title") or ""
+            link = hit.get("url") or hit.get("story_url")
+            if not link:
+                link = f"https://news.ycombinator.com/item?id={hit.get('objectID')}"
+            if not title or link in found:
+                continue
+            found[link] = {
+                "title": title,
+                "link": link,
+                "points": hit.get("points", 0) or 0,
+            }
+
+    return list(found.values())
+
+
+def fetch_rss_stories() -> list[dict]:
+    """RSS manbalaridan so'nggi maqolalarni oladi (popularity ma'lumoti
+    bo'lmagani uchun points=0 qo'yiladi, ya'ni HN natijalaridan pastroq
+    turadi)."""
+    results = []
+    for feed_url in RSS_FEEDS:
+        print(f"RSS tekshirilmoqda: {feed_url}")
+        try:
+            feed = feedparser.parse(feed_url)
+        except Exception as e:
+            print(f"Feed o'qilmadi: {feed_url} -> {e}")
+            continue
+
+        for entry in feed.entries[:10]:
+            link = entry.get("link", "")
+            title = entry.get("title", "")
+            raw_summary = entry.get("summary", "") or entry.get("description", "")
+            summary = clean_summary(raw_summary)
+
+            if not link or not is_relevant(title, summary):
+                continue
+
+            results.append({"title": title, "link": link, "points": 0})
+
+    return results
+
+
 def build_digest_text(items: list[dict]) -> str:
     """items: [{"title_uz": str, "link": str}, ...] ro'yxatidan bitta
-    digest xabar matnini yasaydi (rasmdagi 'ai mastava' formatiga o'xshash)."""
+    digest xabar matnini yasaydi."""
     lines = [f"<b>{DIGEST_TITLE}</b>", DIGEST_SUBTITLE, ""]
     for item in items:
         lines.append(f"● <a href='{item['link']}'>{item['title_uz']}</a>")
@@ -134,39 +210,30 @@ def send_digest_to_telegram(items: list[dict]) -> bool:
 
 def main() -> None:
     seen = load_seen()
-    collected: list[dict] = []
 
-    for feed_url in RSS_FEEDS:
+    print("HackerNews'dan mashhur AI yangiliklari qidirilmoqda...")
+    candidates = fetch_hn_stories()
+    print(f"HackerNews'dan topildi: {len(candidates)} ta nomzod")
+
+    # Agar HN'dan yetarlicha yangi (ko'rilmagan) post topilmasa, RSS bilan to'ldiramiz
+    unseen_hn = [c for c in candidates if c["link"] not in seen]
+    if len(unseen_hn) < NEWS_PER_DIGEST:
+        print("HN'dan yetarli topilmadi, RSS manbalari bilan to'ldirilmoqda...")
+        candidates += fetch_rss_stories()
+
+    # Eng yuqori ball (popularity) bo'yicha saralaymiz
+    candidates.sort(key=lambda c: c["points"], reverse=True)
+
+    collected: list[dict] = []
+    for c in candidates:
         if len(collected) >= NEWS_PER_DIGEST:
             break
-
-        print(f"Tekshirilmoqda: {feed_url}")
-        try:
-            feed = feedparser.parse(feed_url)
-        except Exception as e:
-            print(f"Feed o'qilmadi: {feed_url} -> {e}")
+        if c["link"] in seen:
             continue
-
-        for entry in feed.entries[:10]:
-            if len(collected) >= NEWS_PER_DIGEST:
-                break
-
-            link = entry.get("link", "")
-            title = entry.get("title", "")
-            raw_summary = entry.get("summary", "") or entry.get("description", "")
-
-            if not link or link in seen:
-                continue
-
-            summary = clean_summary(raw_summary)
-
-            if not is_relevant(title, summary):
-                continue
-
-            title_uz = translate_to_uz(title)
-            collected.append({"title_uz": title_uz, "link": link})
-            seen.add(link)
-            print(f"Digestga qo'shildi: {title}")
+        title_uz = translate_to_uz(c["title"])
+        collected.append({"title_uz": title_uz, "link": c["link"]})
+        seen.add(c["link"])
+        print(f"Digestga qo'shildi (points={c['points']}): {c['title']}")
 
     if not collected:
         print("Yangi mos yangilik topilmadi, post joylanmadi.")
