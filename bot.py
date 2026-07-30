@@ -5,14 +5,15 @@ Ishlash mantig'i:
 1. RSS manbalaridan so'nggi maqolalarni o'qiydi
 2. Kalit so'zlar bo'yicha AI-mavzudagi maqolalarni ajratadi
 3. Avval joylanmagan (seen.json'da yo'q) maqolalarni tanlaydi
-4. Sarlavha va qisqa xulosani o'zbek tiliga tarjima qiladi
-5. Telegram kanaliga joylaydi
-6. Joylangan maqola linkini seen.json'ga yozadi (takrorlanmasligi uchun)
+4. Sarlavhalarni o'zbek tiliga tarjima qiladi
+5. Bir nechta yangilikni BITTA digest postga yig'adi:
+   "AI dunyosida nima gap?" sarlavhasi + har biri o'z havolasiga
+   bog'langan sarlavhalar ro'yxati + eng pastda kanal linki
+6. Telegram kanaliga joylaydi va linklarni seen.json'ga yozadi
 """
 
 import json
 import os
-import time
 from pathlib import Path
 
 import feedparser
@@ -39,8 +40,15 @@ KEYWORDS = [
     "model", "neural",
 ]
 
-# Bir ishga tushishda joylanadigan postlar soni (spam bo'lmasligi uchun)
-MAX_POSTS_PER_RUN = 3
+# Bir digest postda nechta yangilik bo'lsin
+NEWS_PER_DIGEST = 4
+
+# Digest postining tepasidagi sarlavha va kirish qatori
+DIGEST_TITLE = "🤖 AI dunyosida nima gap?"
+DIGEST_SUBTITLE = "Hozirgi soatgacha bo'lgan yangiliklar:"
+
+# Har bir postning eng pastida ko'rinadigan kanal linki
+CHANNEL_LINK = "https://t.me/aiyangiliklaruz"
 
 # Ko'rilgan linklar saqlanadigan fayl
 SEEN_FILE = Path(__file__).parent / "seen.json"
@@ -92,8 +100,19 @@ def clean_summary(raw_summary: str, max_len: int = 220) -> str:
     return text
 
 
-def send_to_telegram(title_uz: str, summary_uz: str, link: str, source: str) -> bool:
-    text = f"📰 <b>{title_uz}</b>\n\n{summary_uz}\n\n🔗 <a href='{link}'>{source}</a>"
+def build_digest_text(items: list[dict]) -> str:
+    """items: [{"title_uz": str, "link": str}, ...] ro'yxatidan bitta
+    digest xabar matnini yasaydi (rasmdagi 'ai mastava' formatiga o'xshash)."""
+    lines = [f"<b>{DIGEST_TITLE}</b>", DIGEST_SUBTITLE, ""]
+    for item in items:
+        lines.append(f"● <a href='{item['link']}'>{item['title_uz']}</a>")
+    lines.append("")
+    lines.append(CHANNEL_LINK)
+    return "\n".join(lines)
+
+
+def send_digest_to_telegram(items: list[dict]) -> bool:
+    text = build_digest_text(items)
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
     resp = requests.post(
         url,
@@ -101,7 +120,7 @@ def send_to_telegram(title_uz: str, summary_uz: str, link: str, source: str) -> 
             "chat_id": CHAT_ID,
             "text": text,
             "parse_mode": "HTML",
-            "disable_web_page_preview": False,
+            "disable_web_page_preview": True,
         },
         timeout=30,
     )
@@ -115,11 +134,10 @@ def send_to_telegram(title_uz: str, summary_uz: str, link: str, source: str) -> 
 
 def main() -> None:
     seen = load_seen()
-    posted_this_run = 0
-    newly_seen = []
+    collected: list[dict] = []
 
     for feed_url in RSS_FEEDS:
-        if posted_this_run >= MAX_POSTS_PER_RUN:
+        if len(collected) >= NEWS_PER_DIGEST:
             break
 
         print(f"Tekshirilmoqda: {feed_url}")
@@ -129,10 +147,8 @@ def main() -> None:
             print(f"Feed o'qilmadi: {feed_url} -> {e}")
             continue
 
-        source_name = feed.feed.get("title", feed_url)
-
         for entry in feed.entries[:10]:
-            if posted_this_run >= MAX_POSTS_PER_RUN:
+            if len(collected) >= NEWS_PER_DIGEST:
                 break
 
             link = entry.get("link", "")
@@ -148,21 +164,20 @@ def main() -> None:
                 continue
 
             title_uz = translate_to_uz(title)
-            summary_uz = translate_to_uz(summary)
+            collected.append({"title_uz": title_uz, "link": link})
+            seen.add(link)
+            print(f"Digestga qo'shildi: {title}")
 
-            ok = send_to_telegram(title_uz, summary_uz, link, source_name)
-            if ok:
-                print(f"Joylandi: {title}")
-                seen.add(link)
-                newly_seen.append(link)
-                posted_this_run += 1
-                time.sleep(2)  # Telegram rate-limit uchun kichik pauza
+    if not collected:
+        print("Yangi mos yangilik topilmadi, post joylanmadi.")
+        return
 
-    if newly_seen:
+    ok = send_digest_to_telegram(collected)
+    if ok:
         save_seen(seen)
-        print(f"Jami joylandi: {posted_this_run} ta post")
+        print(f"Digest joylandi: {len(collected)} ta yangilik")
     else:
-        print("Yangi mos post topilmadi.")
+        print("Digest joylanmadi, xato yuz berdi.")
 
 
 if __name__ == "__main__":
