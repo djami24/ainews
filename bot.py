@@ -58,9 +58,9 @@ KEYWORDS = [
 # Bir digest postda nechta yangilik bo'lsin
 NEWS_PER_DIGEST = 4
 
-# Digest postining tepasidagi sarlavha va kirish qatori
-DIGEST_TITLE = "AI dunyosida nima gap?"
-DIGEST_SUBTITLE = "Hozirgi soatgacha bo'lgan eng mashhur yangiliklar:"
+# Digest postining tepasidagi sarlavha va kirish qatori (ingliz tilida)
+DIGEST_TITLE = "What's happening in AI?"
+DIGEST_SUBTITLE = "The most popular news right now:"
 
 # Har bir postning eng pastida ko'rinadigan kanal linki
 CHANNEL_LINK = "https://t.me/aiyangiliklaruz"
