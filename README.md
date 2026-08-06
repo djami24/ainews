@@ -1,8 +1,10 @@
-# AI News Bot — o'zbek tilida avtomatik AI yangiliklar kanali
+# AI News Bot — avtomatik AI yangiliklar kanali
 
-Bu loyiha RSS manbalaridan AI yangiliklarini o'qib, o'zbek tiliga tarjima
-qilib, Telegram kanalingizga avtomatik joylab boradi. To'liq bepul —
-server kerak emas, hammasi GitHub Actions orqali ishlaydi.
+Bu loyiha RSS manbalaridan AI yangiliklarini o'qib (sarlavhalar original
+ingliz tilida qoldiriladi — avtomatik tarjima o'chirilgan, chunki u
+ko'pincha noto'g'ri chiqardi), Telegram kanalingizga avtomatik joylab
+boradi. To'liq bepul — server kerak emas, hammasi GitHub Actions orqali
+ishlaydi.
 
 ## 1-qadam: Telegram bot yaratish
 
@@ -56,9 +58,9 @@ Ikkita secret qo'shing:
 
 ## Muhim eslatmalar
 
-- Tarjima **deep-translator** (Google Translate) orqali bepul amalga
-  oshadi, lekin ba'zan aniqlik cheklangan bo'lishi mumkin — vaqti-vaqti
-  bilan tekshirib turing
+- Sarlavhalar tarjima qilinmaydi, original ingliz tilida joylanadi
+  (avtomatik tarjima ko'pincha xato/tushunarsiz natija bergani uchun
+  o'chirilgan)
 - Har bir post faqat qisqa xulosa + manba havolasini o'z ichiga oladi,
   to'liq maqola matni ko'chirilmaydi (mualliflik huquqini hurmat qilish
   uchun)
