@@ -8,7 +8,8 @@ Ishlash mantig'i:
 2. Agar yetarlicha topilmasa, oddiy RSS manbalaridan to'ldiradi
 3. Barchasini ball (popularity) bo'yicha saralaydi
 4. Avval joylanmagan (seen.json'da yo'q) eng yuqoridagilarni tanlaydi
-5. Sarlavhalarni o'zbek tiliga tarjima qiladi
+5. Sarlavhalar original ingliz tilida qoldiriladi (tarjima o'chirilgan —
+   avtomatik tarjima ko'pincha noto'g'ri/tushunarsiz chiqardi)
 6. Bir nechta yangilikni BITTA digest postga yig'adi:
    "AI dunyosida nima gap?" sarlavhasi + har biri o'z havolasiga
    bog'langan sarlavhalar ro'yxati + eng pastda kanal linki
@@ -26,7 +27,6 @@ from pathlib import Path
 
 import feedparser
 import requests
-from deep_translator import GoogleTranslator
 
 # ---------- SOZLAMALAR ----------
 
@@ -91,16 +91,6 @@ def is_relevant(title: str, summary: str = "") -> bool:
         return True
     text = f"{title} {summary}".lower()
     return any(kw in text for kw in KEYWORDS)
-
-
-def translate_to_uz(text: str) -> str:
-    if not text:
-        return text
-    try:
-        return GoogleTranslator(source="auto", target="uz").translate(text)
-    except Exception as e:
-        print(f"Tarjima xatosi, asl matn qoldiriladi: {e}")
-        return text
 
 
 def clean_summary(raw_summary: str, max_len: int = 220) -> str:
@@ -177,11 +167,11 @@ def fetch_rss_stories() -> list[dict]:
 
 
 def build_digest_text(items: list[dict]) -> str:
-    """items: [{"title_uz": str, "link": str}, ...] ro'yxatidan bitta
+    """items: [{"title": str, "link": str}, ...] ro'yxatidan bitta
     digest xabar matnini yasaydi."""
     lines = [f"<b>{DIGEST_TITLE}</b>", DIGEST_SUBTITLE, ""]
     for item in items:
-        lines.append(f"● <a href='{item['link']}'>{item['title_uz']}</a>")
+        lines.append(f"● <a href='{item['link']}'>{item['title']}</a>")
     lines.append("")
     lines.append(CHANNEL_LINK)
     return "\n".join(lines)
@@ -230,8 +220,7 @@ def main() -> None:
             break
         if c["link"] in seen:
             continue
-        title_uz = translate_to_uz(c["title"])
-        collected.append({"title_uz": title_uz, "link": c["link"]})
+        collected.append({"title": c["title"], "link": c["link"]})
         seen.add(c["link"])
         print(f"Digestga qo'shildi (points={c['points']}): {c['title']}")
 
