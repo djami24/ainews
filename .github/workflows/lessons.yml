@@ -1,0 +1,45 @@
+name: AI Darslar Bot
+
+on:
+  schedule:
+    # Kuniga 2 marta: 04:00 va 14:00 UTC
+    # (Toshkent vaqti bilan ~09:00 va ~19:00, UTC+5)
+    # O'zingizga qulay vaqtga moslashtirish uchun quyidagi ikkita
+    # qatordagi soatlarni o'zgartiring
+    - cron: "0 4 * * *"
+    - cron: "0 14 * * *"
+  workflow_dispatch: {}  # "Run workflow" tugmasi orqali qo'lda ham ishga tushirish mumkin
+
+permissions:
+  contents: write  # lesson_progress.json faylini repo'ga qaytarib commit qilish uchun
+
+jobs:
+  run-lessons:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repo'ni olish
+        uses: actions/checkout@v4
+
+      - name: Python o'rnatish
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Kutubxonalarni o'rnatish
+        run: pip install -r requirements.txt
+
+      - name: Darsni tayyorlab, kanalga joylash
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          LOOP_LESSONS: "false"
+        run: python lessons.py
+
+      - name: lesson_progress.json o'zgarishini saqlash
+        run: |
+          git config user.name "ai-lessons-bot"
+          git config user.email "actions@github.com"
+          git add lesson_progress.json
+          git diff --staged --quiet || git commit -m "Navbatdagi dars joylandi"
+          git push
