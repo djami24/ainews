@@ -51,6 +51,18 @@ CHANNEL_LINK = "https://t.me/aiyangiliklaruz"
 # bilan eski versiyalarni o'chirib, 404 xatosini beradigan qilib qo'yadi.
 GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-flash-latest")
 
+# Asosiy model band/vaqtinchalik ishlamay qolsa (masalan 503 "high demand"),
+# navbat bilan sinab ko'riladigan zaxira modellar
+GEMINI_FALLBACK_MODELS = [
+    m for m in ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-2.5-flash-lite"]
+    if m != GEMINI_MODEL
+]
+
+# Har bir model uchun nechta marta va qancha kutib qayta urinilsin
+# (503/429 kabi vaqtinchalik xatolarda)
+GEMINI_MAX_RETRIES = 3
+GEMINI_RETRY_DELAY_SEC = 20
+
 # Telegramning bitta xabar uchun belgilar limiti (xavfsizlik uchun ozroq marja bilan)
 TELEGRAM_MAX_CHARS = 3900
 
@@ -126,21 +138,18 @@ def list_available_models() -> str:
         return f"Modellar ro'yxatini olishda xato: {e}"
 
 
-def call_gemini(prompt: str) -> str:
+def _call_gemini_once(prompt: str, model: str) -> str:
+    """Bitta modelga bitta so'rov yuboradi (qayta urinishsiz)."""
     url = (
         f"https://generativelanguage.googleapis.com/v1beta/models/"
-        f"{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
+        f"{model}:generateContent?key={GEMINI_API_KEY}"
     )
     body = {
         "contents": [{"parts": [{"text": prompt}]}],
     }
     resp = requests.post(url, json=body, timeout=120)
     if not resp.ok:
-        diag = list_available_models()
-        raise RuntimeError(
-            f"Gemini so'rovi xato qaytardi ({resp.status_code}): {resp.text[:500]}\n"
-            f"DIAGNOSTIKA: {diag}"
-        )
+        raise RuntimeError(f"({resp.status_code}) {resp.text[:400]}")
     data = resp.json()
     candidates = data.get("candidates", [])
     if not candidates:
@@ -150,6 +159,33 @@ def call_gemini(prompt: str) -> str:
     if not text:
         raise RuntimeError(f"Gemini bo'sh matn qaytardi: {data}")
     return text
+
+
+def call_gemini(prompt: str) -> str:
+    """Asosiy modelni bir necha marta qayta urinib ko'radi (vaqtinchalik
+    503/429 xatolar uchun kutib turadi), hamon bo'lmasa navbatdagi zaxira
+    modelga o'tadi."""
+    models_to_try = [GEMINI_MODEL] + GEMINI_FALLBACK_MODELS
+    last_error = None
+
+    for model in models_to_try:
+        for attempt in range(1, GEMINI_MAX_RETRIES + 1):
+            try:
+                print(f"Gemini so'ralmoqda: model={model}, urinish={attempt}/{GEMINI_MAX_RETRIES}")
+                return _call_gemini_once(prompt, model)
+            except Exception as e:
+                last_error = e
+                is_last_attempt_for_model = attempt == GEMINI_MAX_RETRIES
+                print(f"  -> xato: {e}")
+                if not is_last_attempt_for_model:
+                    time.sleep(GEMINI_RETRY_DELAY_SEC)
+        print(f"Model '{model}' bilan {GEMINI_MAX_RETRIES} marta urinildi, navbatdagi modelga o'tilmoqda...")
+
+    diag = list_available_models()
+    raise RuntimeError(
+        f"Barcha modellar ({', '.join(models_to_try)}) band yoki ishlamadi. "
+        f"Oxirgi xato: {last_error}\nDIAGNOSTIKA: {diag}"
+    )
 
 
 def split_into_chunks(text: str, max_len: int = TELEGRAM_MAX_CHARS) -> list[str]:
