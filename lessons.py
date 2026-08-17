@@ -44,8 +44,12 @@ LOOP_LESSONS = os.environ.get("LOOP_LESSONS", "false").lower() == "true"
 # Har bir postning eng pastida ko'rinadigan kanal linki
 CHANNEL_LINK = "https://t.me/aiyangiliklaruz"
 
-# Gemini modeli (kerak bo'lsa GitHub Secrets/Variables orqali o'zgartirish mumkin)
-GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+# Gemini modeli (kerak bo'lsa GitHub Secrets/Variables orqali o'zgartirish mumkin).
+# "gemini-flash-latest" — bu doimiy nom (alias), u doim Google'ning eng so'nggi
+# Flash modeliga ishora qiladi. Aniq versiya nomlarini (masalan
+# "gemini-2.5-flash") qattiq yozib qo'yish tavsiya etilmaydi — Google vaqti-vaqti
+# bilan eski versiyalarni o'chirib, 404 xatosini beradigan qilib qo'yadi.
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-flash-latest")
 
 # Telegramning bitta xabar uchun belgilar limiti (xavfsizlik uchun ozroq marja bilan)
 TELEGRAM_MAX_CHARS = 3900
@@ -103,6 +107,25 @@ Talablar:
   sarlavha qo'shma (sarlavhani men o'zim alohida qo'shaman)"""
 
 
+def list_available_models() -> str:
+    """Diagnostika uchun: shu API kalit bilan qaysi modellar mavjudligini
+    so'raydi. generateContent 404 xato bersa, sababni aniqlashda yordam beradi
+    (masalan: kalit noto'g'ri/yoqilmagan bo'lsa, bu so'rov ham xato beradi;
+    kalit to'g'ri bo'lsa-yu model nomi noto'g'ri bo'lsa, shu yerda mavjud
+    model nomlari ko'rinadi)."""
+    url = f"https://generativelanguage.googleapis.com/v1beta/models?key={GEMINI_API_KEY}"
+    try:
+        resp = requests.get(url, timeout=30)
+        if not resp.ok:
+            return f"Modellar ro'yxatini olishda ham xato ({resp.status_code}): {resp.text[:300]}"
+        names = [m.get("name", "") for m in resp.json().get("models", [])]
+        if not names:
+            return "API kalit ishladi, lekin hech qanday model qaytmadi."
+        return "Shu API kalit bilan mavjud modellar: " + ", ".join(names[:20])
+    except Exception as e:
+        return f"Modellar ro'yxatini olishda xato: {e}"
+
+
 def call_gemini(prompt: str) -> str:
     url = (
         f"https://generativelanguage.googleapis.com/v1beta/models/"
@@ -112,7 +135,12 @@ def call_gemini(prompt: str) -> str:
         "contents": [{"parts": [{"text": prompt}]}],
     }
     resp = requests.post(url, json=body, timeout=120)
-    resp.raise_for_status()
+    if not resp.ok:
+        diag = list_available_models()
+        raise RuntimeError(
+            f"Gemini so'rovi xato qaytardi ({resp.status_code}): {resp.text[:500]}\n"
+            f"DIAGNOSTIKA: {diag}"
+        )
     data = resp.json()
     candidates = data.get("candidates", [])
     if not candidates:
