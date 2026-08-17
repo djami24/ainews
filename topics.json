@@ -1,0 +1,642 @@
+[
+  {
+    "module": "1-MODUL. SUN’IY INTELLEKTGA KIRISH",
+    "topic": "Sun’iy intellekt nima?"
+  },
+  {
+    "module": "1-MODUL. SUN’IY INTELLEKTGA KIRISH",
+    "topic": "AI qanday ishlaydi?"
+  },
+  {
+    "module": "1-MODUL. SUN’IY INTELLEKTGA KIRISH",
+    "topic": "AI, Machine Learning va Deep Learning farqi"
+  },
+  {
+    "module": "1-MODUL. SUN’IY INTELLEKTGA KIRISH",
+    "topic": "Generative AI nima?"
+  },
+  {
+    "module": "1-MODUL. SUN’IY INTELLEKTGA KIRISH",
+    "topic": "ChatGPT, Gemini, Claude va boshqa AI'lar"
+  },
+  {
+    "module": "1-MODUL. SUN’IY INTELLEKTGA KIRISH",
+    "topic": "AI nimalarni qila oladi?"
+  },
+  {
+    "module": "1-MODUL. SUN’IY INTELLEKTGA KIRISH",
+    "topic": "AI nimalarni qila olmaydi?"
+  },
+  {
+    "module": "1-MODUL. SUN’IY INTELLEKTGA KIRISH",
+    "topic": "AI'dan foydalanishda xavfsizlik"
+  },
+  {
+    "module": "1-MODUL. SUN’IY INTELLEKTGA KIRISH",
+    "topic": "AI xatolari va hallucination"
+  },
+  {
+    "module": "1-MODUL. SUN’IY INTELLEKTGA KIRISH",
+    "topic": "AI kelajagi va kasblarga ta’siri"
+  },
+  {
+    "module": "2-MODUL. AI BILAN TO‘G‘RI ISHLASH",
+    "topic": "AI'ga to‘g‘ri savol berish"
+  },
+  {
+    "module": "2-MODUL. AI BILAN TO‘G‘RI ISHLASH",
+    "topic": "Prompt nima?"
+  },
+  {
+    "module": "2-MODUL. AI BILAN TO‘G‘RI ISHLASH",
+    "topic": "Yaxshi prompt va yomon prompt"
+  },
+  {
+    "module": "2-MODUL. AI BILAN TO‘G‘RI ISHLASH",
+    "topic": "Context berish"
+  },
+  {
+    "module": "2-MODUL. AI BILAN TO‘G‘RI ISHLASH",
+    "topic": "Role berish"
+  },
+  {
+    "module": "2-MODUL. AI BILAN TO‘G‘RI ISHLASH",
+    "topic": "Task berish"
+  },
+  {
+    "module": "2-MODUL. AI BILAN TO‘G‘RI ISHLASH",
+    "topic": "Output format berish"
+  },
+  {
+    "module": "2-MODUL. AI BILAN TO‘G‘RI ISHLASH",
+    "topic": "Cheklovlar berish"
+  },
+  {
+    "module": "2-MODUL. AI BILAN TO‘G‘RI ISHLASH",
+    "topic": "Misollar orqali prompt yozish"
+  },
+  {
+    "module": "2-MODUL. AI BILAN TO‘G‘RI ISHLASH",
+    "topic": "Promptni yaxshilash usullari"
+  },
+  {
+    "module": "3-MODUL. PROMPT ENGINEERING",
+    "topic": "Zero-shot prompting"
+  },
+  {
+    "module": "3-MODUL. PROMPT ENGINEERING",
+    "topic": "One-shot prompting"
+  },
+  {
+    "module": "3-MODUL. PROMPT ENGINEERING",
+    "topic": "Few-shot prompting"
+  },
+  {
+    "module": "3-MODUL. PROMPT ENGINEERING",
+    "topic": "Chain-of-thought tushunchasi"
+  },
+  {
+    "module": "3-MODUL. PROMPT ENGINEERING",
+    "topic": "Step-by-step prompting"
+  },
+  {
+    "module": "3-MODUL. PROMPT ENGINEERING",
+    "topic": "Role prompting"
+  },
+  {
+    "module": "3-MODUL. PROMPT ENGINEERING",
+    "topic": "Instruction prompting"
+  },
+  {
+    "module": "3-MODUL. PROMPT ENGINEERING",
+    "topic": "Structured prompting"
+  },
+  {
+    "module": "3-MODUL. PROMPT ENGINEERING",
+    "topic": "JSON format bilan ishlash"
+  },
+  {
+    "module": "3-MODUL. PROMPT ENGINEERING",
+    "topic": "Prompt templates"
+  },
+  {
+    "module": "3-MODUL. PROMPT ENGINEERING",
+    "topic": "Prompt debugging"
+  },
+  {
+    "module": "3-MODUL. PROMPT ENGINEERING",
+    "topic": "Professional prompt yaratish"
+  },
+  {
+    "module": "4-MODUL. CHATGPT'DAN PROFESSIONAL FOYDALANISH",
+    "topic": "ChatGPT bilan suhbatni to‘g‘ri boshlash"
+  },
+  {
+    "module": "4-MODUL. CHATGPT'DAN PROFESSIONAL FOYDALANISH",
+    "topic": "Fayllar bilan ishlash"
+  },
+  {
+    "module": "4-MODUL. CHATGPT'DAN PROFESSIONAL FOYDALANISH",
+    "topic": "PDF va Word hujjatlar"
+  },
+  {
+    "module": "4-MODUL. CHATGPT'DAN PROFESSIONAL FOYDALANISH",
+    "topic": "Jadval va Excel ma’lumotlari"
+  },
+  {
+    "module": "4-MODUL. CHATGPT'DAN PROFESSIONAL FOYDALANISH",
+    "topic": "Rasmni AI orqali tahlil qilish"
+  },
+  {
+    "module": "4-MODUL. CHATGPT'DAN PROFESSIONAL FOYDALANISH",
+    "topic": "Matn yaratish"
+  },
+  {
+    "module": "4-MODUL. CHATGPT'DAN PROFESSIONAL FOYDALANISH",
+    "topic": "Matnni tahrirlash"
+  },
+  {
+    "module": "4-MODUL. CHATGPT'DAN PROFESSIONAL FOYDALANISH",
+    "topic": "Tarjima qilish"
+  },
+  {
+    "module": "4-MODUL. CHATGPT'DAN PROFESSIONAL FOYDALANISH",
+    "topic": "Xulosa chiqarish"
+  },
+  {
+    "module": "4-MODUL. CHATGPT'DAN PROFESSIONAL FOYDALANISH",
+    "topic": "Ma’lumotlarni tahlil qilish"
+  },
+  {
+    "module": "4-MODUL. CHATGPT'DAN PROFESSIONAL FOYDALANISH",
+    "topic": "Tadqiqot qilish"
+  },
+  {
+    "module": "4-MODUL. CHATGPT'DAN PROFESSIONAL FOYDALANISH",
+    "topic": "AI yordamida o‘qish"
+  },
+  {
+    "module": "5-MODUL. AI + TA’LIM",
+    "topic": "AI yordamida dars reja tuzish"
+  },
+  {
+    "module": "5-MODUL. AI + TA’LIM",
+    "topic": "Test yaratish"
+  },
+  {
+    "module": "5-MODUL. AI + TA’LIM",
+    "topic": "Vocabulary yaratish"
+  },
+  {
+    "module": "5-MODUL. AI + TA’LIM",
+    "topic": "Grammar mashqlari"
+  },
+  {
+    "module": "5-MODUL. AI + TA’LIM",
+    "topic": "Reading material yaratish"
+  },
+  {
+    "module": "5-MODUL. AI + TA’LIM",
+    "topic": "Listening material yaratish"
+  },
+  {
+    "module": "5-MODUL. AI + TA’LIM",
+    "topic": "Speaking practice"
+  },
+  {
+    "module": "5-MODUL. AI + TA’LIM",
+    "topic": "IELTS materiallari"
+  },
+  {
+    "module": "5-MODUL. AI + TA’LIM",
+    "topic": "CEFR materiallari"
+  },
+  {
+    "module": "5-MODUL. AI + TA’LIM",
+    "topic": "Individual student uchun AI"
+  },
+  {
+    "module": "5-MODUL. AI + TA’LIM",
+    "topic": "AI tutor yaratish"
+  },
+  {
+    "module": "6-MODUL. AI + KONTENT",
+    "topic": "AI yordamida Instagram post"
+  },
+  {
+    "module": "6-MODUL. AI + KONTENT",
+    "topic": "Telegram post"
+  },
+  {
+    "module": "6-MODUL. AI + KONTENT",
+    "topic": "YouTube script"
+  },
+  {
+    "module": "6-MODUL. AI + KONTENT",
+    "topic": "Reels/Shorts script"
+  },
+  {
+    "module": "6-MODUL. AI + KONTENT",
+    "topic": "Blog yozish"
+  },
+  {
+    "module": "6-MODUL. AI + KONTENT",
+    "topic": "Marketing matnlari"
+  },
+  {
+    "module": "6-MODUL. AI + KONTENT",
+    "topic": "Reklama yaratish"
+  },
+  {
+    "module": "6-MODUL. AI + KONTENT",
+    "topic": "Sarlavha yaratish"
+  },
+  {
+    "module": "6-MODUL. AI + KONTENT",
+    "topic": "Kontent plan"
+  },
+  {
+    "module": "6-MODUL. AI + KONTENT",
+    "topic": "AI bilan personal brand"
+  },
+  {
+    "module": "7-MODUL. AI + RASM",
+    "topic": "AI image generation nima?"
+  },
+  {
+    "module": "7-MODUL. AI + RASM",
+    "topic": "Image prompt yozish"
+  },
+  {
+    "module": "7-MODUL. AI + RASM",
+    "topic": "Poster yaratish"
+  },
+  {
+    "module": "7-MODUL. AI + RASM",
+    "topic": "Logo yaratish"
+  },
+  {
+    "module": "7-MODUL. AI + RASM",
+    "topic": "Social media design"
+  },
+  {
+    "module": "7-MODUL. AI + RASM",
+    "topic": "Product image"
+  },
+  {
+    "module": "7-MODUL. AI + RASM",
+    "topic": "AI photo editing"
+  },
+  {
+    "module": "7-MODUL. AI + RASM",
+    "topic": "Background removal"
+  },
+  {
+    "module": "7-MODUL. AI + RASM",
+    "topic": "Image-to-image"
+  },
+  {
+    "module": "7-MODUL. AI + RASM",
+    "topic": "Professional visual promptlar"
+  },
+  {
+    "module": "8-MODUL. AI + VIDEO VA AUDIO",
+    "topic": "AI video generation"
+  },
+  {
+    "module": "8-MODUL. AI + VIDEO VA AUDIO",
+    "topic": "Text-to-video"
+  },
+  {
+    "module": "8-MODUL. AI + VIDEO VA AUDIO",
+    "topic": "Image-to-video"
+  },
+  {
+    "module": "8-MODUL. AI + VIDEO VA AUDIO",
+    "topic": "AI avatar"
+  },
+  {
+    "module": "8-MODUL. AI + VIDEO VA AUDIO",
+    "topic": "AI voice"
+  },
+  {
+    "module": "8-MODUL. AI + VIDEO VA AUDIO",
+    "topic": "Voice cloning tushunchasi"
+  },
+  {
+    "module": "8-MODUL. AI + VIDEO VA AUDIO",
+    "topic": "Subtitle yaratish"
+  },
+  {
+    "module": "8-MODUL. AI + VIDEO VA AUDIO",
+    "topic": "Video script"
+  },
+  {
+    "module": "8-MODUL. AI + VIDEO VA AUDIO",
+    "topic": "AI bilan video montaj"
+  },
+  {
+    "module": "8-MODUL. AI + VIDEO VA AUDIO",
+    "topic": "YouTube/Reels workflow"
+  },
+  {
+    "module": "9-MODUL. AI + KODLASH",
+    "topic": "Dasturlash nima?"
+  },
+  {
+    "module": "9-MODUL. AI + KODLASH",
+    "topic": "Python nima?"
+  },
+  {
+    "module": "9-MODUL. AI + KODLASH",
+    "topic": "Python o‘rnatish"
+  },
+  {
+    "module": "9-MODUL. AI + KODLASH",
+    "topic": "Variables"
+  },
+  {
+    "module": "9-MODUL. AI + KODLASH",
+    "topic": "Conditions"
+  },
+  {
+    "module": "9-MODUL. AI + KODLASH",
+    "topic": "Loops"
+  },
+  {
+    "module": "9-MODUL. AI + KODLASH",
+    "topic": "Functions"
+  },
+  {
+    "module": "9-MODUL. AI + KODLASH",
+    "topic": "Lists va dictionaries"
+  },
+  {
+    "module": "9-MODUL. AI + KODLASH",
+    "topic": "Files bilan ishlash"
+  },
+  {
+    "module": "9-MODUL. AI + KODLASH",
+    "topic": "API nima?"
+  },
+  {
+    "module": "9-MODUL. AI + KODLASH",
+    "topic": "API key nima?"
+  },
+  {
+    "module": "9-MODUL. AI + KODLASH",
+    "topic": "AI API bilan ishlash"
+  },
+  {
+    "module": "9-MODUL. AI + KODLASH",
+    "topic": "Python + AI"
+  },
+  {
+    "module": "10-MODUL. MACHINE LEARNING",
+    "topic": "Machine Learning nima?"
+  },
+  {
+    "module": "10-MODUL. MACHINE LEARNING",
+    "topic": "Dataset nima?"
+  },
+  {
+    "module": "10-MODUL. MACHINE LEARNING",
+    "topic": "Features va labels"
+  },
+  {
+    "module": "10-MODUL. MACHINE LEARNING",
+    "topic": "Training va testing"
+  },
+  {
+    "module": "10-MODUL. MACHINE LEARNING",
+    "topic": "Supervised learning"
+  },
+  {
+    "module": "10-MODUL. MACHINE LEARNING",
+    "topic": "Unsupervised learning"
+  },
+  {
+    "module": "10-MODUL. MACHINE LEARNING",
+    "topic": "Classification"
+  },
+  {
+    "module": "10-MODUL. MACHINE LEARNING",
+    "topic": "Regression"
+  },
+  {
+    "module": "10-MODUL. MACHINE LEARNING",
+    "topic": "Clustering"
+  },
+  {
+    "module": "10-MODUL. MACHINE LEARNING",
+    "topic": "Model accuracy"
+  },
+  {
+    "module": "10-MODUL. MACHINE LEARNING",
+    "topic": "Overfitting"
+  },
+  {
+    "module": "10-MODUL. MACHINE LEARNING",
+    "topic": "Machine Learning loyihasi"
+  },
+  {
+    "module": "11-MODUL. DEEP LEARNING",
+    "topic": "Neural network nima?"
+  },
+  {
+    "module": "11-MODUL. DEEP LEARNING",
+    "topic": "Neuron qanday ishlaydi?"
+  },
+  {
+    "module": "11-MODUL. DEEP LEARNING",
+    "topic": "Layers"
+  },
+  {
+    "module": "11-MODUL. DEEP LEARNING",
+    "topic": "Activation functions"
+  },
+  {
+    "module": "11-MODUL. DEEP LEARNING",
+    "topic": "Training"
+  },
+  {
+    "module": "11-MODUL. DEEP LEARNING",
+    "topic": "Loss function"
+  },
+  {
+    "module": "11-MODUL. DEEP LEARNING",
+    "topic": "Backpropagation"
+  },
+  {
+    "module": "11-MODUL. DEEP LEARNING",
+    "topic": "CNN"
+  },
+  {
+    "module": "11-MODUL. DEEP LEARNING",
+    "topic": "RNN"
+  },
+  {
+    "module": "11-MODUL. DEEP LEARNING",
+    "topic": "Transformers"
+  },
+  {
+    "module": "12-MODUL. LLM — CHATGPT'NING ASOSI",
+    "topic": "Large Language Model nima?"
+  },
+  {
+    "module": "12-MODUL. LLM — CHATGPT'NING ASOSI",
+    "topic": "Token nima?"
+  },
+  {
+    "module": "12-MODUL. LLM — CHATGPT'NING ASOSI",
+    "topic": "Context window"
+  },
+  {
+    "module": "12-MODUL. LLM — CHATGPT'NING ASOSI",
+    "topic": "Embeddings"
+  },
+  {
+    "module": "12-MODUL. LLM — CHATGPT'NING ASOSI",
+    "topic": "Attention mechanism"
+  },
+  {
+    "module": "12-MODUL. LLM — CHATGPT'NING ASOSI",
+    "topic": "Transformer architecture"
+  },
+  {
+    "module": "12-MODUL. LLM — CHATGPT'NING ASOSI",
+    "topic": "Fine-tuning"
+  },
+  {
+    "module": "12-MODUL. LLM — CHATGPT'NING ASOSI",
+    "topic": "RAG nima?"
+  },
+  {
+    "module": "12-MODUL. LLM — CHATGPT'NING ASOSI",
+    "topic": "Vector database"
+  },
+  {
+    "module": "12-MODUL. LLM — CHATGPT'NING ASOSI",
+    "topic": "AI chatbot qanday ishlaydi?"
+  },
+  {
+    "module": "13-MODUL. AI AGENTLAR",
+    "topic": "AI Agent nima?"
+  },
+  {
+    "module": "13-MODUL. AI AGENTLAR",
+    "topic": "Chatbot va Agent farqi"
+  },
+  {
+    "module": "13-MODUL. AI AGENTLAR",
+    "topic": "Tools nima?"
+  },
+  {
+    "module": "13-MODUL. AI AGENTLAR",
+    "topic": "Agentga internet berish"
+  },
+  {
+    "module": "13-MODUL. AI AGENTLAR",
+    "topic": "Agentga fayl berish"
+  },
+  {
+    "module": "13-MODUL. AI AGENTLAR",
+    "topic": "Agentga database ulash"
+  },
+  {
+    "module": "13-MODUL. AI AGENTLAR",
+    "topic": "Multi-step AI workflow"
+  },
+  {
+    "module": "13-MODUL. AI AGENTLAR",
+    "topic": "AI automation"
+  },
+  {
+    "module": "13-MODUL. AI AGENTLAR",
+    "topic": "Telegram AI bot"
+  },
+  {
+    "module": "13-MODUL. AI AGENTLAR",
+    "topic": "AI Agent yaratish"
+  },
+  {
+    "module": "14-MODUL. AI AUTOMATION",
+    "topic": "Automation nima?"
+  },
+  {
+    "module": "14-MODUL. AI AUTOMATION",
+    "topic": "AI + Telegram"
+  },
+  {
+    "module": "14-MODUL. AI AUTOMATION",
+    "topic": "AI + Instagram"
+  },
+  {
+    "module": "14-MODUL. AI AUTOMATION",
+    "topic": "AI + Google Sheets"
+  },
+  {
+    "module": "14-MODUL. AI AUTOMATION",
+    "topic": "AI + Gmail"
+  },
+  {
+    "module": "14-MODUL. AI AUTOMATION",
+    "topic": "AI + Website"
+  },
+  {
+    "module": "14-MODUL. AI AUTOMATION",
+    "topic": "AI + Forms"
+  },
+  {
+    "module": "14-MODUL. AI AUTOMATION",
+    "topic": "AI orqali avtomatik post"
+  },
+  {
+    "module": "14-MODUL. AI AUTOMATION",
+    "topic": "AI orqali avtomatik tarjima"
+  },
+  {
+    "module": "14-MODUL. AI AUTOMATION",
+    "topic": "AI orqali avtomatik kontent"
+  },
+  {
+    "module": "15-MODUL. REAL LOYIHALAR",
+    "topic": "AI vocabulary generator"
+  },
+  {
+    "module": "15-MODUL. REAL LOYIHALAR",
+    "topic": "AI grammar checker"
+  },
+  {
+    "module": "15-MODUL. REAL LOYIHALAR",
+    "topic": "AI essay checker"
+  },
+  {
+    "module": "15-MODUL. REAL LOYIHALAR",
+    "topic": "AI IELTS assistant"
+  },
+  {
+    "module": "15-MODUL. REAL LOYIHALAR",
+    "topic": "AI Telegram bot"
+  },
+  {
+    "module": "15-MODUL. REAL LOYIHALAR",
+    "topic": "AI quiz generator"
+  },
+  {
+    "module": "15-MODUL. REAL LOYIHALAR",
+    "topic": "AI content generator"
+  },
+  {
+    "module": "15-MODUL. REAL LOYIHALAR",
+    "topic": "AI customer support bot"
+  },
+  {
+    "module": "15-MODUL. REAL LOYIHALAR",
+    "topic": "AI education assistant"
+  },
+  {
+    "module": "15-MODUL. REAL LOYIHALAR",
+    "topic": "Shaxsiy AI assistant"
+  }
+]
