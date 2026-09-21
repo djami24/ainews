@@ -112,22 +112,21 @@ Bugungi mavzu: {topic}
 (Bu kursning {lesson_no}-darsi, jami {total} ta dars bor)
 
 Talablar:
-- Mavzuni hech narsa bilmaydigan 10 yoshli bolaga tushuntirgandek yoz —
-  juda sodda, jonli, qiziqarli tarzda. O'quvchi o'qib bo'lgach "voy, shunday
-  ekan-da!" deb hayratlanishi kerak
+- O'quvchi — AI bilan tanish bo'lmagan oddiy kattalar (25-35 yosh).
+  Sodda va tushunarli yoz, lekin bolalarcha emas. Na'ra urma, na mushuk-dinozavr misol keltirma.
+  Gapirish ohangi: yaxshi do'sting suhbatdoshingga tushuntirayotgandek — samimiy, aniq, qiziqarli
 - Quyidagi tuzilishda yoz:
-  1) Kirish — o'quvchini qiziqtiradigan savol yoki hayotiy holat bilan boshlang
-     (2-3 gap, mavzuni nima uchun o'rganish kerakligini his ettirsin)
-  2) Asosiy tushuntirish — tushunchani oddiy so'zlar va ko'plab jonli
-     misollar orqali batafsil ochib ber. Qiyoslar, metaforalar ishlatavering
-  3) Kamida 2-3 ta real hayotiy yoki kulgili amaliy misol keltir
-  4) "Esda tuting" — 3-4 ta muhim xulosani aniq va qisqa qilib yoz
-  5) Mustaqil mashq — o'quvchi hoziroq sinab ko'rishi mumkin bo'lgan
-     1 ta kichik, qiziqarli topshiriq
+  1) Kirish — hayotdan olingan real holat yoki savol bilan boshlang
+     (ish, pul, vaqt, muloqot — kundalik hayot bilan bog'liq)
+  2) Asosiy tushuntirish — tushunchani oddiy so'zlar bilan batafsil ochib ber,
+     o'rinli qiyoslar va aniq misollar ishlat
+  3) 2-3 ta real, amaliy misol keltir — ChatGPT, ish, ijtimoiy tarmoq, biznes kabi
+  4) "Esda tuting" — 3-4 ta asosiy xulosani aniq yoz
+  5) Mustaqil mashq — o'quvchi hoziroq o'z hayotida sinab ko'rishi mumkin bo'lgan topshiriq
 - Faqat quyidagi oddiy HTML teglaridan foydalan: <b>qalin</b>, <i>qiyshiq</i>.
   Boshqa teg ishlatma (h1, ul, li, img va h.k. ishlatma)
 - Matn to'liq va batafsil bo'lsin — 400-600 so'z atrofida
-- Emoji'lardan o'rinli va quvnoq tarzda foydalanish mumkin
+- Hech qanday emoji ishlatma — na matn ichida, na sarlavhada
 - Javobingda faqat tayyor dars matnini yoz, boshqa hech qanday izoh yoki
   sarlavha qo'shma (sarlavhani men o'zim alohida qo'shaman)"""
 
@@ -237,7 +236,7 @@ def send_lesson_to_telegram(
     rasm sarlavha bilan, matn esa alohida sendMessage orqali yuboriladi.
     Shu tarzda Telegram 4096 belgilik matn limitidan to'liq foydalaniladi.
     """
-    header = f"<b>📚 Dars {lesson_no}/{total}</b>\n<b>{module}</b>\n<b>{topic}</b>"
+    header = f"<b>Dars {lesson_no}/{total}</b>\n<b>{module}</b>\n<b>{topic}</b>"
     footer = f"\n\n#dars{lesson_no}\n{CHANNEL_LINK}"
 
     # 1) Avval rasm + qisqa sarlavha
