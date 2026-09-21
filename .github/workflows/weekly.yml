@@ -1,0 +1,33 @@
+name: Haftalik Darslar PDF
+
+on:
+  schedule:
+    # Har yakshanba soat 20:00 Toshkent (15:00 UTC)
+    # lessons.yml dagi oxirgi darsdan keyin (15:00 UTC) ishga tushadi
+    - cron: "30 15 * * 0"
+  workflow_dispatch: {}  # Qo'lda sinab ko'rish uchun
+
+permissions:
+  contents: read
+
+jobs:
+  weekly-pdf:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repo'ni olish
+        uses: actions/checkout@v4
+
+      - name: Python o'rnatish
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Kutubxonalarni o'rnatish
+        run: pip install requests reportlab
+
+      - name: Haftalik PDF tayyorlab, kanalga joylash
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python weekly_summary.py
