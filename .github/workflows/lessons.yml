@@ -2,12 +2,15 @@ name: AI Darslar Bot
 
 on:
   schedule:
-    # Kuniga 2 marta: 04:00 va 14:00 UTC
-    # (Toshkent vaqti bilan ~09:00 va ~19:00, UTC+5)
-    # O'zingizga qulay vaqtga moslashtirish uchun quyidagi ikkita
-    # qatordagi soatlarni o'zgartiring
-    - cron: "0 4 * * *"
-    - cron: "0 14 * * *"
+    # Kuniga 4 marta: Toshkent vaqti (UTC+5) bilan
+    # 08:00 Toshkent  = 03:00 UTC
+    # 12:00 Toshkent  = 07:00 UTC
+    # 16:00 Toshkent  = 11:00 UTC
+    # 20:00 Toshkent  = 15:00 UTC
+    - cron: "0 3 * * *"
+    - cron: "0 7 * * *"
+    - cron: "0 11 * * *"
+    - cron: "0 15 * * *"
   workflow_dispatch: {}  # "Run workflow" tugmasi orqali qo'lda ham ishga tushirish mumkin
 
 permissions:
