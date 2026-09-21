@@ -34,9 +34,9 @@ PROGRESS_FILE = Path(__file__).parent / "lesson_progress.json"
 LOOP_LESSONS = os.environ.get("LOOP_LESSONS", "false").lower() == "true"
 CHANNEL_LINK = "https://t.me/aiyangiliklaruz"
 
-GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-flash-latest")
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-flash-lite-latest")
 GEMINI_FALLBACK_MODELS = [
-    m for m in ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-2.5-flash-lite"]
+    m for m in ["gemini-3.1-flash-lite", "gemini-flash-latest", "gemini-pro-latest"]
     if m != GEMINI_MODEL
 ]
 GEMINI_MAX_RETRIES = 3
