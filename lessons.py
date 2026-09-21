@@ -112,21 +112,22 @@ Bugungi mavzu: {topic}
 (Bu kursning {lesson_no}-darsi, jami {total} ta dars bor)
 
 Talablar:
-- Sodda, tushunarli o'zbek tilida yoz, mavzuni hech narsa bilmaydigan
-  boshlang'ich darajadagi o'quvchiga tushuntirgandek yoz
+- Mavzuni hech narsa bilmaydigan 10 yoshli bolaga tushuntirgandek yoz —
+  juda sodda, jonli, qiziqarli tarzda. O'quvchi o'qib bo'lgach "voy, shunday
+  ekan-da!" deb hayratlanishi kerak
 - Quyidagi tuzilishda yoz:
-  1) Qisqa kirish — bu mavzu nima haqida va nega muhim (2-3 gap)
-  2) Asosiy tushuntirish — tushunchani aniq, misollar bilan ochib ber
-  3) Kamida 1-2 ta real hayotiy yoki amaliy misol
-  4) "Esda tuting" — mavzu bo'yicha 2-3 ta muhim xulosa
-  5) Mustaqil mashq — o'quvchi shu darsdan keyin sinab ko'rishi mumkin
-     bo'lgan 1 ta kichik topshiriq
-- Telegram sendPhoto caption sifatida chiqadi (limit 1024 belgi), shuning
-  uchun faqat quyidagi oddiy HTML teglaridan foydalan: <b>qalin</b>,
-  <i>qiyshiq</i>. Boshqa teg ishlatma (h1, ul, li, img va h.k. ishlatma)
-- Matn juda qisqa va ixcham bo'lsin — taxminan 180-250 so'z atrofida bo'lsin
-  (caption uchun joy kam, shuning uchun asosiy g'oyalarnigina yoz)
-- Emoji'lardan o'rinli va kam miqdorda foydalanish mumkin
+  1) Kirish — o'quvchini qiziqtiradigan savol yoki hayotiy holat bilan boshlang
+     (2-3 gap, mavzuni nima uchun o'rganish kerakligini his ettirsin)
+  2) Asosiy tushuntirish — tushunchani oddiy so'zlar va ko'plab jonli
+     misollar orqali batafsil ochib ber. Qiyoslar, metaforalar ishlatavering
+  3) Kamida 2-3 ta real hayotiy yoki kulgili amaliy misol keltir
+  4) "Esda tuting" — 3-4 ta muhim xulosani aniq va qisqa qilib yoz
+  5) Mustaqil mashq — o'quvchi hoziroq sinab ko'rishi mumkin bo'lgan
+     1 ta kichik, qiziqarli topshiriq
+- Faqat quyidagi oddiy HTML teglaridan foydalan: <b>qalin</b>, <i>qiyshiq</i>.
+  Boshqa teg ishlatma (h1, ul, li, img va h.k. ishlatma)
+- Matn to'liq va batafsil bo'lsin — 400-600 so'z atrofida
+- Emoji'lardan o'rinli va quvnoq tarzda foydalanish mumkin
 - Javobingda faqat tayyor dars matnini yoz, boshqa hech qanday izoh yoki
   sarlavha qo'shma (sarlavhani men o'zim alohida qo'shaman)"""
 
@@ -230,30 +231,47 @@ def send_message_to_telegram(text: str) -> bool:
 def send_lesson_to_telegram(
     module: str, topic: str, lesson_no: int, total: int, body: str, image_url: str
 ) -> bool:
-    """Darsni rasm bilan birga yuboradi.
-    
-    Telegram sendPhoto caption limiti: 1024 belgi.
-    Agar caption sig'masa, avval rasm (qisqa sarlavha bilan), keyin matn alohida.
+    """Darsni yuboradi: avval rasm (sarlavha bilan), keyin to'liq matn alohida.
+
+    Matn uzun bo'lgani uchun (400-600 so'z) caption ishlatilmaydi —
+    rasm sarlavha bilan, matn esa alohida sendMessage orqali yuboriladi.
+    Shu tarzda Telegram 4096 belgilik matn limitidan to'liq foydalaniladi.
     """
-    header = f"<b>📚 Dars {lesson_no}/{total}</b>\n<b>{module}</b>\n<b>{topic}</b>\n\n"
+    header = f"<b>📚 Dars {lesson_no}/{total}</b>\n<b>{module}</b>\n<b>{topic}</b>"
     footer = f"\n\n#dars{lesson_no}\n{CHANNEL_LINK}"
-    full_caption = header + body + footer
 
-    # Caption 1024 belgidan oshmasin
-    if len(full_caption) <= 1024:
-        ok = send_photo_to_telegram(image_url, full_caption)
-        if ok:
-            return True
-
-    # Agar caption uzun bo'lsa: avval rasm qisqa sarlavha bilan, keyin matn
-    short_caption = header.rstrip()
-    ok1 = send_photo_to_telegram(image_url, short_caption)
+    # 1) Avval rasm + qisqa sarlavha
+    ok1 = send_photo_to_telegram(image_url, header)
     if not ok1:
         return False
+
     time.sleep(1)
+
+    # 2) Keyin to'liq dars matni alohida xabar sifatida
     full_text = body + footer
-    ok2 = send_message_to_telegram(full_text)
-    return ok2
+
+    # Agar matn 4096 belgidan uzun bo'lsa, bo'lib yuboriladi
+    chunks = []
+    remaining = full_text
+    while len(remaining) > 3900:
+        split_at = remaining.rfind("\n\n", 0, 3900)
+        if split_at == -1:
+            split_at = remaining.rfind("\n", 0, 3900)
+        if split_at == -1:
+            split_at = 3900
+        chunks.append(remaining[:split_at].strip())
+        remaining = remaining[split_at:].strip()
+    if remaining:
+        chunks.append(remaining)
+
+    for i, chunk in enumerate(chunks):
+        ok = send_message_to_telegram(chunk)
+        if not ok:
+            return False
+        if i < len(chunks) - 1:
+            time.sleep(1)
+
+    return True
 
 
 # ---------- ASOSIY MANTIQ ----------
