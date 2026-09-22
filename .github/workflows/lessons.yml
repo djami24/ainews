@@ -2,15 +2,19 @@ name: AI Darslar Bot
 
 on:
   schedule:
-    # Kuniga 4 marta: Toshkent vaqti (UTC+5) bilan
+    # Kuniga 6 marta: Toshkent vaqti (UTC+5) bilan
     # 08:00 Toshkent  = 03:00 UTC
-    # 12:00 Toshkent  = 07:00 UTC
-    # 16:00 Toshkent  = 11:00 UTC
-    # 20:00 Toshkent  = 15:00 UTC
+    # 10:30 Toshkent  = 05:30 UTC
+    # 13:00 Toshkent  = 08:00 UTC
+    # 15:30 Toshkent  = 10:30 UTC
+    # 18:00 Toshkent  = 13:00 UTC
+    # 20:30 Toshkent  = 15:30 UTC
     - cron: "0 3 * * *"
-    - cron: "0 7 * * *"
-    - cron: "0 11 * * *"
-    - cron: "0 15 * * *"
+    - cron: "30 5 * * *"
+    - cron: "0 8 * * *"
+    - cron: "30 10 * * *"
+    - cron: "0 13 * * *"
+    - cron: "30 15 * * *"
   workflow_dispatch: {}  # "Run workflow" tugmasi orqali qo'lda ham ishga tushirish mumkin
 
 permissions:
