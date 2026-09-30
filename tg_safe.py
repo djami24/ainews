@@ -6,6 +6,7 @@ Ishlatish: lessons.py faylining ENG BIRINCHI qatoriga yozing:
     import tg_safe
 
 Nima qiladi:
+0) NO_PHOTOS = True bo'lsa, rasm umuman yuborilmaydi — dars faqat matn bo'ladi.
 1) Rasm havolasini Telegram o'zi emas, bot yuklab olib, fayl sifatida yuboradi
    ("failed to get HTTP URL content" xatosi yo'qoladi).
 2) Rasm yuklanmasa — dars rasmsiz, oddiy matn sifatida yuboriladi (dars to'xtab qolmaydi).
@@ -16,6 +17,12 @@ import atexit
 import json
 import os
 import requests
+
+# ── SOZLAMA ──────────────────────────────────────────────
+# True  = rasm umuman yuborilmaydi, dars faqat matn bo'lib chiqadi
+# False = rasm yuboriladi (yuklanmasa matn bo'lib chiqadi)
+NO_PHOTOS = True
+# ─────────────────────────────────────────────────────────
 
 _orig_request = requests.sessions.Session.request
 _state = {"ok": 0, "fail": 0}
@@ -99,7 +106,10 @@ def _safe_photo(url, kw):
     api_base = url.rsplit("/", 1)[0]
     photo_url = fields.pop("photo")
     caption = fields.get("caption", "") or ""
-    img = _download(photo_url)
+    if NO_PHOTOS:
+        img = None            # rasm yuklab ham o'tirmaymiz
+    else:
+        img = _download(photo_url)
 
     if img:
         f = dict(fields)
@@ -115,7 +125,7 @@ def _safe_photo(url, kw):
         print("sendPhoto xato:", resp.text[:300])
 
     # Rasm bo'lmadi — rasmsiz davom etamiz
-    print("Rasm yuborilmadi, dars rasmsiz yuboriladi.")
+    print("Rasm yuborilmaydi, dars rasmsiz (matn) yuboriladi.")
     if caption:
         return _send_text(api_base, fields, caption)
     return _fake_ok()
