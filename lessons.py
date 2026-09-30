@@ -10,7 +10,7 @@ Ishlash mantig'i:
    avval o'tilgan mavzular qayta tashlanmaydi.
 4. Gemini API'ga o'sha mavzu bo'yicha to'liq, tushunarli dars matni
    (o'zbek tilida) yozib berish so'raladi.
-5. Tayyor dars matni + mavzuga mos rasm Telegram kanaliga joylanadi.
+5. Tayyor dars matni (rasmsiz, faqat matn) Telegram kanaliga joylanadi.
 6. Muvaffaqiyatli joylansa, index birga oshiriladi va lesson_progress.json'ga
    yoziladi (keyingi safar navbatdagi mavzu olinadi).
 7. Barcha mavzular tugagach, LOOP_LESSONS=true qilib qo'yilsa, kurs
@@ -22,6 +22,8 @@ Kuniga 4 marta GitHub Actions orqali avtomatik ishga tushadi:
 
 import json
 import os
+import re
+import sys
 import time
 from pathlib import Path
 
@@ -41,46 +43,10 @@ GEMINI_FALLBACK_MODELS = [
 ]
 GEMINI_MAX_RETRIES = 3
 GEMINI_RETRY_DELAY_SEC = 20
-TELEGRAM_MAX_CHARS = 1000  # sendPhoto caption uchun limit
 
 GEMINI_API_KEY = os.environ["GEMINI_API_KEY"]
 BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
 CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
-
-# ---------- MAVZUGA MOS RASM URL'LARI ----------
-# Har bir kalit so'z bo'yicha Unsplash'dan bepul rasmlar (Creative Commons)
-# Rasm URL'lari ochiq va litsenziyasiz (Unsplash free license)
-MODULE_IMAGES = {
-    "default": "https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=800&q=80",
-    "neyron": "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800&q=80",
-    "machine learning": "https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?w=800&q=80",
-    "deep learning": "https://images.unsplash.com/photo-1488229297570-58520851e868?w=800&q=80",
-    "chatgpt": "https://images.unsplash.com/photo-1676272747765-9d06697e41b0?w=800&q=80",
-    "robototexnika": "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80",
-    "robot": "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80",
-    "kompyuter": "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80",
-    "tarix": "https://images.unsplash.com/photo-1461360370896-922624d12aa1?w=800&q=80",
-    "algoritm": "https://images.unsplash.com/photo-1509228468518-180dd4864904?w=800&q=80",
-    "ma'lumot": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80",
-    "dasturlash": "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&q=80",
-    "til": "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=800&q=80",
-    "rasm": "https://images.unsplash.com/photo-1574861573-2e0ecc6eb3a7?w=800&q=80",
-    "ovoz": "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=800&q=80",
-    "etika": "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&q=80",
-    "kelajak": "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80",
-    "sun'iy intellekt": "https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=800&q=80",
-    "ai": "https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=800&q=80",
-}
-
-
-def get_image_url(module: str, topic: str) -> str:
-    """Modul va mavzu nomiga qarab mos rasm URL'ini qaytaradi."""
-    combined = f"{module} {topic}".lower()
-    for keyword, url in MODULE_IMAGES.items():
-        if keyword in combined:
-            return url
-    return MODULE_IMAGES["default"]
-
 
 # ---------- YORDAMCHI FUNKSIYALAR ----------
 
@@ -191,26 +157,14 @@ def call_gemini(prompt: str) -> str:
     )
 
 
-def send_photo_to_telegram(photo_url: str, caption: str) -> bool:
-    """Rasm + caption (HTML) yuboradi. Rasm URL orqali beriladi."""
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendPhoto"
-    resp = requests.post(
-        url,
-        data={
-            "chat_id": CHAT_ID,
-            "photo": photo_url,
-            "caption": caption,
-            "parse_mode": "HTML",
-        },
-        timeout=60,
-    )
-    if not resp.ok:
-        print(f"Telegramga rasm yuborishda xato: {resp.status_code} {resp.text}")
-    return resp.ok
+def _strip_tags(text: str) -> str:
+    """HTML teglarni olib tashlaydi (HTML xato bersa, oddiy matn sifatida yuborish uchun)."""
+    text = re.sub(r"<[^>]+>", "", text)
+    return text.replace("&lt;", "<").replace("&gt;", ">").replace("&amp;", "&")
 
 
 def send_message_to_telegram(text: str) -> bool:
-    """Faqat matn yuboradi (caption juda uzun bo'lganda zaxira usul)."""
+    """Matn yuboradi. HTML xato bersa, teglarsiz qayta urinib ko'radi."""
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
     resp = requests.post(
         url,
@@ -222,34 +176,40 @@ def send_message_to_telegram(text: str) -> bool:
         },
         timeout=30,
     )
-    if not resp.ok:
-        print(f"Telegramga matn yuborishda xato: {resp.status_code} {resp.text}")
-    return resp.ok
+    if resp.ok:
+        return True
+
+    print(f"Telegramga matn yuborishda xato: {resp.status_code} {resp.text}")
+    if resp.status_code == 400 and "parse" in resp.text.lower():
+        print("HTML formatida xato, teglarsiz qayta yuborilmoqda...")
+        resp = requests.post(
+            url,
+            data={
+                "chat_id": CHAT_ID,
+                "text": _strip_tags(text),
+                "disable_web_page_preview": True,
+            },
+            timeout=30,
+        )
+        if not resp.ok:
+            print(f"Teglarsiz ham yuborilmadi: {resp.status_code} {resp.text}")
+        return resp.ok
+    return False
 
 
 def send_lesson_to_telegram(
-    module: str, topic: str, lesson_no: int, total: int, body: str, image_url: str
+    module: str, topic: str, lesson_no: int, total: int, body: str
 ) -> bool:
-    """Darsni yuboradi: avval rasm (sarlavha bilan), keyin to'liq matn alohida.
+    """Darsni faqat matn ko'rinishida yuboradi (rasmsiz).
 
-    Matn uzun bo'lgani uchun (400-600 so'z) caption ishlatilmaydi —
-    rasm sarlavha bilan, matn esa alohida sendMessage orqali yuboriladi.
-    Shu tarzda Telegram 4096 belgilik matn limitidan to'liq foydalaniladi.
+    Sarlavha + dars matni + pastki qism bitta xabar bo'lib ketadi;
+    matn 4096 belgidan uzun bo'lsa, bir necha xabarga bo'linadi.
     """
     header = f"<b>Dars {lesson_no}/{total}</b>\n<b>{module}</b>\n<b>{topic}</b>"
     footer = f"\n\n#dars{lesson_no}\n{CHANNEL_LINK}"
+    full_text = header + "\n\n" + body + footer
 
-    # 1) Avval rasm + qisqa sarlavha
-    ok1 = send_photo_to_telegram(image_url, header)
-    if not ok1:
-        return False
-
-    time.sleep(1)
-
-    # 2) Keyin to'liq dars matni alohida xabar sifatida
-    full_text = body + footer
-
-    # Agar matn 4096 belgidan uzun bo'lsa, bo'lib yuboriladi
+    # 4096 belgidan uzun bo'lsa, bo'lib yuboriladi
     chunks = []
     remaining = full_text
     while len(remaining) > 3900:
@@ -264,8 +224,7 @@ def send_lesson_to_telegram(
         chunks.append(remaining)
 
     for i, chunk in enumerate(chunks):
-        ok = send_message_to_telegram(chunk)
-        if not ok:
+        if not send_message_to_telegram(chunk):
             return False
         if i < len(chunks) - 1:
             time.sleep(1)
@@ -303,17 +262,15 @@ def main() -> None:
         body = call_gemini(prompt)
     except Exception as e:
         print(f"Gemini xatosi, dars joylanmadi: {e}")
-        return
+        sys.exit(1)  # Actions qizil ✗ bo'lsin, xato darrov ko'rinsin
 
-    image_url = get_image_url(module, topic)
-    print(f"Rasm URL: {image_url}")
-
-    ok = send_lesson_to_telegram(module, topic, lesson_no, total, body, image_url)
+    ok = send_lesson_to_telegram(module, topic, lesson_no, total, body)
     if ok:
         save_progress(index + 1)
         print(f"Dars joylandi: {lesson_no}/{total} — {topic}")
     else:
         print("Dars joylanmadi, Telegramga yuborishda xato yuz berdi.")
+        sys.exit(1)
 
 
 if __name__ == "__main__":
